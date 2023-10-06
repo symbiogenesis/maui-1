@@ -73,6 +73,14 @@ namespace Microsoft.Maui.Controls.Platform
 		{
 			int maxLines = label.MaxLines;
 
+			if (maxLines < 0)
+			{
+				if (label.LineBreakMode == LineBreakMode.TailTruncation)
+					maxLines = 1;
+				else
+					maxLines = 0;
+			}
+
 			switch (label.LineBreakMode)
 			{
 				case LineBreakMode.NoWrap:
@@ -95,8 +103,6 @@ namespace Microsoft.Maui.Controls.Platform
 					break;
 				case LineBreakMode.TailTruncation:
 					platformLabel.LineBreakMode = UILineBreakMode.TailTruncation;
-					if (maxLines < 0)
-						maxLines = 1;
 					break;
 			}
 
