@@ -58,7 +58,6 @@ namespace Microsoft.Maui.Controls.Platform
 					textView.Ellipsize = null;
 					break;
 				case LineBreakMode.WordWrap:
-					maxLines = 0;
 					textView.Ellipsize = null;
 					break;
 				case LineBreakMode.CharacterWrap:
