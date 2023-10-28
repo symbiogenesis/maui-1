@@ -21,8 +21,8 @@ namespace UITest.Appium.NUnit
 	//#endif
 	public abstract class UITestBase : UITestContextBase
 	{
-		public UITestBase(TestDevice testDevice)
-			: base(testDevice)
+		public UITestBase(TestDevice testDevice, bool useBrowserStack)
+			: base(testDevice, useBrowserStack)
 		{
 		}
 
@@ -31,11 +31,23 @@ namespace UITest.Appium.NUnit
 		{
 			var name = TestContext.CurrentContext.Test.MethodName ?? TestContext.CurrentContext.Test.Name;
 			TestContext.Progress.WriteLine($">>>>> {DateTime.Now} {name} Start");
+
+			// For BrowserStack, InitialSetup is called for each test as BrowserStack expects the driver to be
+			// recreated for each test, so each test has its own session
+			if (_useBrowserStack)
+			{
+				InitialSetup(UITestContextSetupFixture.ServerContext);
+			}
 		}
 
 		[TearDown]
 		public void RecordTestTeardown()
 		{
+			if (_useBrowserStack)
+			{
+				TearDown();
+			}
+
 			var name = TestContext.CurrentContext.Test.MethodName ?? TestContext.CurrentContext.Test.Name;
 			TestContext.Progress.WriteLine($">>>>> {DateTime.Now} {name} Stop");
 		}
@@ -55,14 +67,19 @@ namespace UITest.Appium.NUnit
 		[TearDown]
 		public void UITestBaseTearDown()
 		{
-
-			if (App.AppState == ApplicationState.Not_Running)
+			// With BrowserStack, checking AppState isn't supported currently, producing the error below,
+			// so skip this on BrowserStack
+			// BrowserStack error: System.NotImplementedException : Unknown mobile command "queryAppState". Only shell,scrollBackTo,viewportScreenshot,deepLink,startLogsBroadcast,stopLogsBroadcast,acceptAlert,dismissAlert,batteryInfo,deviceInfo,changePermissions,getPermissions,performEditorAction,startScreenStreaming,stopScreenStreaming,getNotifications,listSms,type commands are supported
+			if (!_useBrowserStack)
 			{
-				// Assert.Fail will immediately exit the test which is desirable as the app is not
-				// running anymore so we don't want to log diagnostic data as there is nothing to collect from
-				Reset();
-				FixtureSetup();
-				Assert.Fail("The app was expected to be running still, investigate as possible crash");
+				if (App.AppState == ApplicationState.Not_Running)
+				{
+					// Assert.Fail will immediately exit the test which is desirable as the app is not
+					// running anymore so we don't want to log diagnostic data as there is nothing to collect from
+					Reset();
+					FixtureSetup();
+					Assert.Fail("The app was expected to be running still, investigate as possible crash");
+				}
 			}
 
 			var testOutcome = TestContext.CurrentContext.Result.Outcome;
@@ -101,7 +118,19 @@ namespace UITest.Appium.NUnit
 				SaveDiagnosticLogs("OneTimeTearDown");
 			}
 
-			FixtureTeardown();
+			if (_useBrowserStack)
+			{
+				// FixtureTeardown normally navigates back to the home page, and needs an Appium connection
+				// to do that. For BrowserStack, since the connection is recreated for each test, it needs to be
+				// recreated for the teardown
+				InitialSetup(UITestContextSetupFixture.ServerContext);
+				FixtureTeardown();
+				TearDown();
+			}
+			else
+			{
+				FixtureTeardown();
+			}
 		}
 
 		void SaveDiagnosticLogs(string? note = null)
