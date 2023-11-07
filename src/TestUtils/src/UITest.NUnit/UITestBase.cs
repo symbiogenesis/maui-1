@@ -1,4 +1,5 @@
-﻿using System.Reflection;
+﻿using System.Diagnostics;
+using System.Reflection;
 using NUnit.Framework;
 using NUnit.Framework.Interfaces;
 using UITest.Core;
@@ -32,9 +33,7 @@ namespace UITest.Appium.NUnit
 			var name = TestContext.CurrentContext.Test.MethodName ?? TestContext.CurrentContext.Test.Name;
 			TestContext.Progress.WriteLine($">>>>> {DateTime.Now} {name} Start");
 
-			// For BrowserStack, InitialSetup is called for each test as BrowserStack expects the driver to be
-			// recreated for each test, so each test has its own session
-			if (_useBrowserStack)
+			if (RunTestsInIsolation)
 			{
 				InitialSetup(UITestContextSetupFixture.ServerContext);
 			}
@@ -43,7 +42,7 @@ namespace UITest.Appium.NUnit
 		[TearDown]
 		public void RecordTestTeardown()
 		{
-			if (_useBrowserStack)
+			if (RunTestsInIsolation)
 			{
 				TearDown();
 			}
@@ -118,19 +117,7 @@ namespace UITest.Appium.NUnit
 				SaveDiagnosticLogs("OneTimeTearDown");
 			}
 
-			if (_useBrowserStack)
-			{
-				// FixtureTeardown normally navigates back to the home page, and needs an Appium connection
-				// to do that. For BrowserStack, since the connection is recreated for each test, it needs to be
-				// recreated for the teardown
-				InitialSetup(UITestContextSetupFixture.ServerContext);
-				FixtureTeardown();
-				TearDown();
-			}
-			else
-			{
-				FixtureTeardown();
-			}
+			FixtureTeardown();
 		}
 
 		void SaveDiagnosticLogs(string? note = null)
