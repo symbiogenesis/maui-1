@@ -13,6 +13,18 @@ namespace Maui.Controls.Sample
 		public MainPage()
 		{
 			InitializeComponent();
+			//entry.Completed += Entry_Completed;
+		}
+
+		int i = 0;
+		void Entry_Completed(object? sender, EventArgs e)
+		{
+			System.Diagnostics.Debug.WriteLine("DONE");
+			i++;
+			if (i > 10)
+			{
+
+			}
 		}
 	}
 }

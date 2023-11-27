@@ -3,4 +3,13 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
     x:Class="Maui.Controls.Sample.MainPage"
     xmlns:local="clr-namespace:Maui.Controls.Sample">
+    <VerticalStackLayout>
+        <Entry x:Name="entry"></Entry>
+        <Entry x:Name="entry2" ReturnType="Done" Completed="Entry_Completed"></Entry>
+        <Entry x:Name="entry4" Completed="Entry_Completed"></Entry>
+        <Entry  ReturnType="Go" Completed="Entry_Completed"></Entry>
+        <Entry  ReturnType="Search" Completed="Entry_Completed"></Entry>
+        <Entry  ReturnType="Send" Completed="Entry_Completed"></Entry>
+        <Entry  ReturnType="Next" Completed="Entry_Completed"></Entry>
+    </VerticalStackLayout>
 </ContentPage>

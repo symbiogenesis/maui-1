@@ -192,41 +192,97 @@ namespace Microsoft.Maui.Handlers
 
 		void OnEditorAction(object? sender, EditorActionEventArgs e)
 		{
+			System.Diagnostics.Debug.WriteLine($"OnEditorAction {e.Event?.KeyCode} Action: {e?.Event?.Action} {e.Handled} ImeOptions: {PlatformView.ImeOptions} ActionId: {e.ActionId}");
+
 			var returnType = VirtualView?.ReturnType;
+
+			// Inside of the android implementations that map events to listeners, the default return value for "Handled" is always true
+			// This means, just by subscribing to EditorAction/KeyPressed/etc.. you change the behavior of the control
+			// So, we are setting handled to false here in order to maintain default behavior
 			bool handled = false;
-
-			if (returnType is not null)
+			if (returnType != null)
 			{
-				var currentInputImeFlag = returnType.Value.ToPlatform();
+				var actionId = e.ActionId;
+				var evt = e.Event;
+				ImeAction currentInputImeFlag = PlatformView.ImeOptions;
 
-				if (e.IsCompletedAction(currentInputImeFlag))
+				// On API 34 it looks like they fixed the issue where the actionId is ImeAction.ImeNull when using a keyboard
+				// so I'm just setting the actionId here to the current ImeOptions so the logic can all be simplified
+				if (actionId == ImeAction.ImeNull && evt?.KeyCode == Keycode.Enter)
+				{
+					actionId = currentInputImeFlag;
+				}
+
+				// keyboard path
+				if (evt?.KeyCode == Keycode.Enter && evt?.Action == KeyEventActions.Down)
+				{
+					handled = true;
+				}
+				else if (evt?.KeyCode == Keycode.Enter && evt?.Action == KeyEventActions.Up)
 				{
 					VirtualView?.Completed();
-
-					if (returnType == ReturnType.Done &&
-						e.ActionId == ImeAction.ImeNull &&
-						e.Event?.KeyCode == Keycode.Enter &&
-						e.Event?.Action == KeyEventActions.Up)
-					{
-						handled = true;
-					}
 				}
-				else if (e.ActionId == ImeAction.ImeNull &&
-						 e.Event?.KeyCode == Keycode.Enter &&
-						 e.Event?.Action == KeyEventActions.Down &&
-						 returnType == ReturnType.Done)
+				// InputPaneView Path
+				else if(evt?.KeyCode is null && (actionId == ImeAction.Done || actionId == currentInputImeFlag))
 				{
-					// If the user has indicated that they want this to be a "done" field
-					// then we will mark this as handled if we detect the enter key.
-					// The reason for doing this on Down is that this will now cause the "Up"
-					// to still be processed by this Editor action
-					// The `IsCompletedAction` above will process the `completed`
-					handled = true;
+					VirtualView?.Completed();
 				}
 			}
 
 			e.Handled = handled;
 		}
+
+		////bool waitingForUserToReleaseEnterKey;
+		//void OnEditorAction(object? sender, EditorActionEventArgs e)
+		//{
+		//	System.Diagnostics.Debug.WriteLine($"OnEditorAction {e.Event?.KeyCode} {e.Handled}");
+		//	e.Handled = false;
+
+			//	/*if (e.Event?.KeyCode == Keycode.Enter &&
+			//		e.Event.Action != KeyEventActions.Down)
+			//	{
+			//		waitingForUserToReleaseEnterKey = false;
+			//	}
+
+			//	var returnType = VirtualView?.ReturnType;
+			//	bool handled = true;
+
+			//	if (returnType is not null)
+			//	{
+			//		var currentInputImeFlag = returnType.Value.ToPlatform();
+
+			//		System.Diagnostics.Debug.WriteLine($"keycode: {e.Event?.KeyCode} ActionId: {e.ActionId} {e.Event?.Action}");
+
+			//		if ((e.ActionId == ImeAction.ImeNull || e.ActionId == ImeAction.Done) &&
+			//			e.Event?.KeyCode == Keycode.Enter &&
+			//			e.Event?.Action == KeyEventActions.Down &&
+			//			returnType == ReturnType.Done)
+			//		{
+			//			// If the user has indicated that they want this to be a "done" entry
+			//			// then we will mark this as handled if we detect the enter key.
+			//			// The reason for doing this on Down is that this will now cause the "Up"
+			//			// to still be processed by this OnEditorAction action
+			//			// The `IsCompletedAction` below will send the `Completed`
+			//			handled = true;
+			//			waitingForUserToReleaseEnterKey = true;
+			//		}
+			//		else if (e.IsCompletedAction(currentInputImeFlag))
+			//		{
+			//			if (!waitingForUserToReleaseEnterKey)
+			//				VirtualView?.Completed();
+
+			//			if (returnType == ReturnType.Done &&
+			//				(e.ActionId == ImeAction.ImeNull || e.ActionId == ImeAction.Done) &&
+			//				e.Event?.KeyCode == Keycode.Enter &&
+			//				e.Event?.Action == KeyEventActions.Up)
+			//			{
+			//				handled = true;
+			//			}
+			//		}
+			//	}
+
+			//	e.Handled = handled;*/
+			//}
 
 		private void OnSelectionChanged(object? sender, EventArgs e)
 		{
