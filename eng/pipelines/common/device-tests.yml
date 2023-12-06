@@ -79,15 +79,18 @@ stages:
                     REQUIRED_XCODE: $(DEVICETESTS_REQUIRED_XCODE)
                     PROJECT_PATH: ${{ project.ios }}
                     ${{ if eq(version, 'latest') }}:
-                      DEVICE: ios-simulator-64
+                      DEVICE: ios-device
+                      APIVERSION: 15.8
                     ${{ else }}:
                       DEVICE: ios-simulator-64_${{ version }}
+                      APIVERSION: ${{ version }}
       steps:
         - template: device-tests-steps.yml
           parameters:
             platform: ios
             path: $(PROJECT_PATH)
             device: $(DEVICE)
+            apiVersion: $(APIVERSION)
             windowsPackageId: ios # Only needed for Windows, will be ignored
             provisionatorChannel: ${{ parameters.provisionatorChannel }}
             agentPoolAccessToken: ${{ parameters.agentPoolAccessToken }}
