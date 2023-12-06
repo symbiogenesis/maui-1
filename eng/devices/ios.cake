@@ -233,12 +233,25 @@ Task("Test")
 	var settings = new DotNetToolSettings {
 		ToolPath = DOTNET_TOOL_PATH,
 		DiagnosticOutput = true,
-		ArgumentCustomization = args => args.Append("run xharness apple test " +
-		$"--app=\"{TEST_APP}\" " +
-		$"--targets=\"{TEST_DEVICE}\" " +
-		$"--output-directory=\"{TEST_RESULTS}\" " +
-		xcode_args +
-		$"--verbosity=\"Debug\" ")
+		ArgumentCustomization = args => 
+		{
+			args.Append("run xharness apple test " +
+				$"--app=\"{TEST_APP}\" " +
+				$"--targets=\"{TEST_DEVICE}\" " +
+				$"--output-directory=\"{TEST_RESULTS}\" " +
+				xcode_args +
+				$"--verbosity=\"Debug\" ");
+			
+			if (TEST_DEVICE.Contains("device"))
+			{
+				if(string.IsNullOrEmpty(DEVICE_UDID))
+				{
+					throw new Exception("No device was found to install the app on. See the Setup method for more details.");
+				}
+				args.Append($"--device=\"{DEVICE_UDID}\" ");
+			}
+			return args;	
+		}
 	};
 
 	bool testsFailed = true;
