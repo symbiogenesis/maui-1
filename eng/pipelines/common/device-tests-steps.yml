@@ -19,7 +19,7 @@ steps:
       ${{ if or(eq(parameters.platform, 'ios'), eq(parameters.platform, 'catalyst'), eq(parameters.platform, 'android'))}}:
         platform: macos
       skipXcode: ${{ or(eq(parameters.platform, 'android'), eq(parameters.platform, 'windows')) }}
-      skipProvisioning: ${{ eq(parameters.platform, 'windows') }}
+      skipProvisioning: ${{ or(eq(parameters.platform, 'windows'),eq(parameters.platform, 'ios')) }}
       provisionatorChannel: ${{ parameters.provisionatorChannel }}
 
   - pwsh: ./build.ps1 --target=dotnet --configuration="Release" --verbosity=diagnostic
@@ -76,6 +76,6 @@ steps:
       artifactName: '$(Agent.JobName) (attempt $(System.JobAttempt))'
 
   # This must always be placed as the last step in the job
-  - template: agent-rebooter/mac.v1.yml@yaml-templates
-    parameters:
-      AgentPoolAccessToken: ${{ parameters.agentPoolAccessToken }}
+  # - template: agent-rebooter/mac.v1.yml@yaml-templates
+  #   parameters:
+  #     AgentPoolAccessToken: ${{ parameters.agentPoolAccessToken }}

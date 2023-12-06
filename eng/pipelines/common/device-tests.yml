@@ -5,6 +5,7 @@ parameters:
   windowsPool: { }
   androidApiLevels: [ 33 ]
   iosVersions: [ 'latest' ]
+  iosDeviceVersions: [ '15' ]
   catalystVersions: [ 'latest' ]
   provisionatorChannel: 'latest'
   agentPoolAccessToken: ''
@@ -42,14 +43,17 @@ stages:
                     PROJECT_PATH: ${{ project.android }}
                     ${{ if eq(api, 27) }}:
                       DEVICE: android-emulator-32_${{ api }}
+                      APIVERSION: ${{ api }}
                     ${{ if not(eq(api, 27)) }}:
                       DEVICE: android-emulator-64_${{ api }}
+                      APIVERSION: ${{ api }}
       steps:
         - template: device-tests-steps.yml
           parameters:
             platform: android
             path: $(PROJECT_PATH) 
             device: $(DEVICE)
+            apiVersion: $(APIVERSION)
             windowsPackageId: android # Only needed for Windows, will be ignored
             provisionatorChannel: ${{ parameters.provisionatorChannel }}
             agentPoolAccessToken: ${{ parameters.agentPoolAccessToken }}
@@ -78,9 +82,9 @@ stages:
                   ${{ replace(coalesce(project.desc, project.name), ' ', '_') }}_V_${{ version }}:
                     REQUIRED_XCODE: $(DEVICETESTS_REQUIRED_XCODE)
                     PROJECT_PATH: ${{ project.ios }}
-                    ${{ if eq(version, 'latest') }}:
+                    ${{ if eq(version, 'device') }}:
                       DEVICE: ios-device
-                      APIVERSION: 15.8
+                      APIVERSION: 15
                     ${{ else }}:
                       DEVICE: ios-simulator-64_${{ version }}
                       APIVERSION: ${{ version }}
@@ -129,6 +133,7 @@ stages:
             platform: catalyst
             path: $(PROJECT_PATH)
             device: $(DEVICE)
+            apiVersion: macos # Only needed for iOS, will be ignored
             windowsPackageId: catalyst # Only needed for Windows, will be ignored
             provisionatorChannel: ${{ parameters.provisionatorChannel }}
             agentPoolAccessToken: ${{ parameters.agentPoolAccessToken }}
@@ -162,6 +167,7 @@ stages:
           parameters:
             platform: windows
             path: $(PROJECT_PATH)
+            apiVersion: windows # Only needed for iOS, will be ignored
             windowsPackageId: $(PACKAGE_ID)
             device: $(DEVICE) # For Windows this switches between packaged and unpackaged
             provisionatorChannel: ${{ parameters.provisionatorChannel }}
