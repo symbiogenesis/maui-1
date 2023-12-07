@@ -107,7 +107,7 @@ stages:
       agentPoolAccessToken: $(AgentPoolAccessToken)
       ${{ if or(parameters.BuildEverything, and(ne(variables['Build.Reason'], 'PullRequest'), eq(variables['System.TeamProject'], 'devdiv'))) }}:
         androidApiLevels: [ 33, 30, 29, 28, 27, 26, 25, 24, 23 ]
-        iosVersions: [ 'device-16', 'device-15', '16.4' ]
+        iosVersions: [ 'device-17', 'device-16', 'device-15', 'simulator-16.4' ]
         catalystVersions: [ 'latest' ]
         windowsVersions: ['packaged', 'unpackaged']
         provisionatorChannel: ${{ parameters.provisionatorChannel }}

@@ -69,7 +69,7 @@ stages:
     - job: ios_device_tests
       workspace:
         clean: all
-      displayName: "iOS simulator tests"
+      displayName: "iOS tests"
       pool: ${{ parameters.iosPool }}
       timeoutInMinutes: 140
       strategy:
@@ -86,8 +86,8 @@ stages:
                       DEVICE: ios-device
                       APIVERSION: ${{ replace(version, 'device-', '') }}
                     ${{ else }}:
-                      DEVICE: ios-simulator-64_${{ version }}
-                      APIVERSION: ${{ version }}
+                      DEVICE: ios-simulator-64_${{ replace(version, 'simulator-', '') }}
+                      APIVERSION: ${{ replace(version, 'simulator-', '') }}
       steps:
         - template: device-tests-steps.yml
           parameters:
