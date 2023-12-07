@@ -82,9 +82,9 @@ stages:
                   ${{ replace(coalesce(project.desc, project.name), ' ', '_') }}_V_${{ version }}:
                     REQUIRED_XCODE: $(DEVICETESTS_REQUIRED_XCODE)
                     PROJECT_PATH: ${{ project.ios }}
-                    ${{ if eq(version, 'device') }}:
+                    ${{ if contains(version, 'device') }}:
                       DEVICE: ios-device
-                      APIVERSION: 15
+                      APIVERSION: ${{ replace(version, 'device-', '') }}
                     ${{ else }}:
                       DEVICE: ios-simulator-64_${{ version }}
                       APIVERSION: ${{ version }}
