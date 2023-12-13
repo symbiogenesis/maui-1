@@ -1022,7 +1022,6 @@ namespace Microsoft.Maui.DeviceTests
 			});
 
 			await AssertionExtensions.WaitForGC(pageReference);
-			Assert.False(pageReference.IsAlive, "Page should not be alive!");
 		}
 
 		[Fact(DisplayName = "HideSoftInputOnTapped Doesnt Crash If Entry Is Still Focused After Window Is Null")]
