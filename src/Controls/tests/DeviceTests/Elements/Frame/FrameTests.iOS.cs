@@ -3,6 +3,7 @@ using Microsoft.Maui.Controls;
 using Microsoft.Maui.Graphics;
 using Microsoft.Maui.Platform;
 using Xunit;
+using static Microsoft.Maui.DeviceTests.AssertHelpers;
 
 namespace Microsoft.Maui.DeviceTests
 {
@@ -39,7 +40,7 @@ namespace Microsoft.Maui.DeviceTests
 					if (platformView.Element is IView element)
 					{
 						var platformShadow = element.Shadow;
-						await AssertionExtensions.Wait(() => platformShadow != null);
+						await AssertEventually(() => platformShadow != null);
 
 						Assert.Equal(platformShadow.Radius, expectedShadow.Radius);
 						Assert.Equal(platformShadow.Opacity, expectedShadow.Opacity);
