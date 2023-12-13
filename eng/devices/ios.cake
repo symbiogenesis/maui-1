@@ -320,7 +320,8 @@ Task("cg-uitest")
 	var nunitSettings = new NUnit3Settings { 
 		Configuration = CONFIGURATION,
 		OutputFile = $"{TEST_RESULTS}/ios/run_uitests_output.log",
-		Work = $"{TEST_RESULTS}/ios"
+		Work = $"{TEST_RESULTS}/ios",
+		TraceLevel = NUnitInternalTraceLevel.Verbose
 	};
 
 	Information("Outputfile {0}", nunitSettings.OutputFile);
