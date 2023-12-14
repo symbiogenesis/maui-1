@@ -192,7 +192,7 @@ namespace Microsoft.Maui.Handlers
 
 		void OnEditorAction(object? sender, EditorActionEventArgs e)
 		{
-			System.Diagnostics.Debug.WriteLine($"OnEditorAction {e.Event?.KeyCode} Action: {e?.Event?.Action} {e.Handled} ImeOptions: {PlatformView.ImeOptions} ActionId: {e.ActionId}");
+			System.Diagnostics.Debug.WriteLine($"OnEditorAction {e.Event?.KeyCode} Action: {e.Event?.Action} {e.Handled} ImeOptions: {PlatformView.ImeOptions} ActionId: {e.ActionId}");
 
 			var returnType = VirtualView?.ReturnType;
 
