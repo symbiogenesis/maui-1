@@ -8,7 +8,7 @@ parameters:
   provisionatorChannel: 'latest'
   agentPoolAccessToken: ''
   configuration : "Release"
-  where : ""
+  where : "cat==Issues"
   targetSample: "dotnet-legacy-controlgallery"
   provisionPlatform: "windows"
 
